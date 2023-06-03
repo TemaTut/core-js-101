@@ -23,10 +23,11 @@
  *   getComposition(Math.sin, Math.asin)(x) => Math.sin(Math.asin(x))
  *
  */
-function getComposition(/* f, g */) {
-  throw new Error('Not implemented');
+function getComposition(f, g) {
+  return function composedFn(x) {
+    return f(g(x));
+  };
 }
-
 
 /**
  * Returns the math power function with the specified exponent
@@ -44,10 +45,11 @@ function getComposition(/* f, g */) {
  *   power05(16) => 4
  *
  */
-function getPowerFunction(/* exponent */) {
-  throw new Error('Not implemented');
+function getPowerFunction(exponent) {
+  return function power(x) {
+    return x ** exponent;
+  };
 }
-
 
 /**
  * Returns the polynom function of one argument based on specified coefficients.
@@ -62,10 +64,20 @@ function getPowerFunction(/* exponent */) {
  *   getPolynom(8)     => y = 8
  *   getPolynom()      => null
  */
-function getPolynom() {
-  throw new Error('Not implemented');
+function getPolynom(...coefficients) {
+  if (coefficients.length === 0) {
+    return null;
+  }
+  return function polynom(x) {
+    let result = 0;
+    let power = coefficients.length - 1;
+    for (let i = 0; i < coefficients.length; i += 1) {
+      result += coefficients[i] * (x ** power);
+      power -= 1;
+    }
+    return result;
+  };
 }
-
 
 /**
  * Memoizes passed function and returns function
@@ -81,10 +93,16 @@ function getPolynom() {
  *   ...
  *   memoizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(/* func */) {
-  throw new Error('Not implemented');
+function memoize(func) {
+  let cache = null;
+  function myFn() {
+    if (cache === null) {
+      cache = func();
+    }
+    return cache;
+  }
+  return myFn;
 }
-
 
 /**
  * Returns the function trying to call the passed function and if it throws,
