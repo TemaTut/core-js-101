@@ -119,10 +119,25 @@ function memoize(func) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  return function myFn() {
+    let result;
+    let error;
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        result = func();
+        error = null;
+        break;
+      } catch (err) {
+        error = err;
+      }
+    }
+    if (error) {
+      throw error;
+    }
+    return result;
+  };
 }
-
 
 /**
  * Returns the logging wrapper for the specified method,
@@ -147,10 +162,20 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
-}
+function logger(func, logFunc) {
+  return function logWrapper(...args) {
+    const argString = args
+      .map((arg) => JSON.stringify(arg))
+      .join(',');
+    const logMessage = `${func.name}(${argString})`;
 
+    logFunc(`${logMessage} starts`);
+    const result = func.apply(this, args);
+    logFunc(`${logMessage} ends`);
+
+    return result;
+  };
+}
 
 /**
  * Return the function with partial applied arguments
@@ -165,10 +190,11 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(fn, ...args1) {
+  return function myFn(...args2) {
+    return fn(...args1, ...args2);
+  };
 }
-
 
 /**
  * Returns the id generator function that returns next integer starting
@@ -187,10 +213,14 @@ function partialUsingArguments(/* fn, ...args1 */) {
  *   getId4() => 7
  *   getId10() => 11
  */
-function getIdGeneratorFunction(/* startFrom */) {
-  throw new Error('Not implemented');
+function getIdGeneratorFunction(startFrom) {
+  let id = startFrom;
+  return function myFn() {
+    const currentId = id;
+    id += 1;
+    return currentId;
+  };
 }
-
 
 module.exports = {
   getComposition,
